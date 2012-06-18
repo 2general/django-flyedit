@@ -2,11 +2,14 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-flyedit',
-    version='0.1',
+    version='0.1.1',
     description='Tools for Django in-line editing',
     author='Antti Kaihola',
     author_email='antti@2general.com',
     packages=find_packages(),
+    package_data = {
+        '': ['static/flyedit/js/*.js'],
+    },
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Framework :: Django',
