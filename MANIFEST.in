@@ -1,1 +1,2 @@
 recursive-include flyedit/static *.js
+recursive-include flyedit/static *.css

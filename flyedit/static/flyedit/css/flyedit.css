@@ -1,0 +1,12 @@
+.flyedit-image-remove {
+    background: #ffb1a1;
+    border-radius: 50%;
+    width: 13px;
+    height: 13px;
+    border: solid #f6311a 3px;
+    cursor: pointer;
+}
+
+.flyedit-image-remove:hover {
+    background: #f6311a;
+}
