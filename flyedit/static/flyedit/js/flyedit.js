@@ -46,16 +46,13 @@ flyedit = {
     fieldTypes: {
         image: {
             html: {
-                removeButton: '<div class="flyedit-image-remove" style="position: relative;">' +
-                              '&nbsp;' +
+                removeButton: '<div class="flyedit-image-remove">' +
+                              '&times;' +
                               '</div>'
             },
             init: function(wrapper, info) {
                 var image,
-                    removeData,
-                    $removeButton,
-                    buttonPos,
-                    imagePos;
+                    removeData;
                 if (info.selector === undefined) {
                     info.selector = 'img';
                 }
@@ -65,12 +62,9 @@ flyedit = {
                                   action: 'image_change',
                                   new_value: null,
                                   wrapper: wrapper};
-                    $removeButton = $(this.html.removeButton).insertAfter(image);
-                    buttonPos = $removeButton.position();
-                    imagePos = image.position();
-                    $removeButton.css('top', '-' + (buttonPos.top - imagePos.top) + 'px')
-                                 .css('left', (imagePos.left + image.outerWidth() - buttonPos.left - $removeButton.outerWidth()) + 'px')
-                                 .on('click', removeData, flyedit.handleAction);
+                    $(this.html.removeButton)
+                        .insertAfter(image)
+                        .on('click', removeData, flyedit.handleAction);
                 }
             }
         },
