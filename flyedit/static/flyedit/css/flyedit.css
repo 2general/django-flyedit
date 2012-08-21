@@ -13,3 +13,8 @@
     color: #f6311a;
     border-color: #f6311a;
 }
+
+.flyedit-choices-radio {
+    background: #fff;
+    border: solid #aaa 1px;
+}

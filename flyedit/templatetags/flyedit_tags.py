@@ -30,12 +30,18 @@ class FlyeditNode(Node):
                 'app_label': app_label,
                 'model_name': model_name,
                 'field_name': field_name,
-                'pk': instance.pk}
+                'pk': instance.pk,
+                'csrfmiddlewaretoken': unicode(context['csrf_token'])}
         if template_name:
             data['template_name'] = template_name
         field = instance._meta.get_field(field_name)
         if isinstance(field, models.ImageField):
             data['type'] = 'image'
+        elif field.choices:
+            data['type'] = 'choices'
+            data['value'] = getattr(instance, field_name)
+            data['choices'] = [[value,  unicode(label)]
+                               for value, label in field.choices]
         elif isinstance(field, models.TextField):
             data['type'] = 'text'
             data['value'] = getattr(instance, field_name)

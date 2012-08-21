@@ -1,11 +1,14 @@
 from django.db.models import get_model
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.generic import View
 
 
 class Flyedit(View):
+    # pylint: disable=W0212
+    #         Access to a protected member of a client class
+
     def post(self, request):
         """Modifies a model instance and returns re-rendered HTML for it
 
@@ -26,7 +29,10 @@ class Flyedit(View):
         #         Used * or ** magic
         data = request.POST
         action = getattr(self, data['action'])
-        context = action(data)
+        try:
+            context = action(data, request.FILES)
+        except IOError as e:
+            return HttpResponseBadRequest(unicode(e))
         if 'template_name' in data:
             template_name = data['template_name']
         else:
@@ -39,22 +45,36 @@ class Flyedit(View):
                                   context,
                                   RequestContext(request))
 
-    def image_change(self, data):
-        # pylint: disable=W0212
-        #         Access to a protected member of a client class
+    def _get_instance(self, data):
         model = get_model(data['app_label'], data['model_name'])
         queryset = (model._default_manager
                     .select_for_update()
                     .filter(pk=data['pk']))
         try:
-            instance = queryset[0]
+            return queryset[0]
         except IndexError:
             raise Http404
+
+    def image_change(self, data, _files):
+        instance = self._get_instance(data)
         field_name = data['field_name']
+        field = instance._meta.get_field(field_name)
+        new_value = field.to_python(data['new_value'])
         old_value = getattr(instance, field_name)
-        setattr(instance, field_name, data['new_value'])
+        setattr(instance, field_name, new_value)
         instance.save()
         return {data['varname']: instance,
                 'old_value': old_value}
 
     text_change = image_change
+    choices_change = image_change
+
+    def image_upload(self, data, files):
+        instance = self._get_instance(data)
+        field_name = data['field_name']
+        field = getattr(instance, field_name)
+        old_value = field.name
+        file_ = files['flyedit-image-upload']
+        field.save(file_.name, file_)
+        return {data['varname']: instance,
+                'old_value': old_value}
