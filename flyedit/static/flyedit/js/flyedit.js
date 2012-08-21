@@ -17,10 +17,10 @@
 
 
     $.flyedit = {
-        makePostData: function(data, info) {
+        makePostData: function(action, data, info) {
             // Prepares POST data for submitting an action.
+            // `action` must be the action name (e.g. 'image_change')
             // `data` must contain the per-action information:
-            //   * `action`: the action name (e.g. 'image_change')
             //   * `new_value`: the new value of the field
             // `info` must contain instance data:
             //   * `template_name`: template to render and return from server after save
@@ -30,7 +30,7 @@
             //   * `pk`: the primary key of the saved instance
             //   * `field_name`: the field to change
             //   * `csrfmiddlewaretoken`: Django's CSRF middleware token
-            return {action: data.action,
+            return {action: action,
                     template_name: info.template_name,
                     varname: info.varname,
                     app_label: info.app_label,
@@ -41,10 +41,10 @@
                     csrfmiddlewaretoken: info.csrfmiddlewaretoken};
         },
 
-        handleAction: function(event) {
-            // called when e.g. tte "Remove image" button is clicked
+        handleAction: function(action, event) {
+            // called when e.g. the "Remove image" button is clicked
             $.post(event.data.info.url, 
-                   $.flyedit.makePostData(event.data, event.data.info),
+                   $.flyedit.makePostData(action, event.data, event.data.info),
                    function(html) {
                        $(html).replaceAll(event.data.wrapper)
                            .flyedit();
@@ -75,20 +75,31 @@
                     var html = this.html,
                         image,
                         actionData,
-                        $form;
+                        $form,
+                        handleAction = function(event) {
+                            // called when e.g. the "Remove image" button is clicked
+                            $.post(info.url,
+                                   $.flyedit.makePostData('image_change', event.data, info),
+                                   function(html) {
+                                       $(html).replaceAll(wrapper).flyedit();
+                                   });
+                            return false;
+                        };
+
                     if (info.selector === undefined) {
+                        // by default, the image is the only <img> tag inside
+                        // the wrapper
                         info.selector = 'img';
                     }
+
                     image = $(info.selector, wrapper);
                     if (image.length) {
                         // There is an image -> display a remove button
-                        actionData = {info: info,
-                                      action: 'image_change',
-                                      new_value: null,
+                        actionData = {new_value: null,
                                       wrapper: wrapper};
                         $(html.removeButton)
                             .insertAfter(image)
-                            .on('click', actionData, $.flyedit.handleAction);
+                            .on('click', actionData, handleAction);
                     } else {
                         // There is no image -> display an upload form
                         $uploadButton = $(html.uploadButton);
@@ -97,7 +108,6 @@
                             .on('click', function() {
                                 var $button = $(this);
                                 actionData = {info: info,
-                                              action: 'image_upload',
                                               wrapper: wrapper};
                                 $form = $('#flyedit-image-upload-wrapper');
                                 if ($form.length) {
@@ -117,11 +127,9 @@
                                 $button.after($form).hide();  // hide the upload button
                                 $form.show();  // show the form just in case it was hidden
                                 $('#flyedit-image-upload').fileupload({
-                                    formData: $.flyedit.makePostData(actionData, info),
+                                    formData: $.flyedit.makePostData('image_upload', actionData, info),
                                     done: function(e, data) {
-                                        $form.remove();
-                                        $(data.result).replaceAll(wrapper)
-                                            .flyedit();
+                                        $(data.result).replaceAll(wrapper).flyedit();
                                     },
                                     fail: function(e, data) {
                                         $('.error', $form).remove();
@@ -185,7 +193,7 @@
                                   action: 'text_change',
                                   new_value: $('.flyedit-text-editor', wrapper).val(),
                                   wrapper: wrapper};
-                    $.flyedit.handleAction(event);
+                    $.flyedit.handleAction('text_change', event);
                     return false;
                 },
 
@@ -205,52 +213,51 @@
                         '<div class="flyedit-choices-radio">' +
                         '</div>',
                     option:
-                        '<input type="radio" name="flyedit-choices-radio"' +
-                        ' value="VALUE" CHECKED> LABEL<br>',
+                        '<label>' +
+                        '    <input type="radio"' +
+                        '     name="flyedit-choices-radio"' +
+                        '     value="VALUE" CHECKED>' +
+                        '    LABEL' +
+                        '</label>' +
+                        '<br>',
                     editButton:
                         '<a href="#" class="flyedit-choices-edit">[edit]</a>'
                 },
 
                 init: function(wrapper, info) {
                     var self = this,
-                        editButton = $(this.html.editButton);
+                        editButton = $(this.html.editButton),
+                        handleEditClick = function(event) {
+                            select = $(self.html.select).on('click', ':input', handleChange);
+                            $.each(info.choices, function() {
+                                var value = this[0],
+                                label = this[1],
+                                checked = value == info.value ? ' checked' : '';
+                                select.append(
+                                    self.html.option
+                                        .replace('VALUE', value)
+                                        .replace('LABEL', label)
+                                        .replace('CHECKED', checked));
+                            });
+                            $('.flyedit-choices-edit', wrapper).before(select).hide();
+                            $(info.selector, wrapper).hide();
+                        },
+                        handleChange = function(event) {
+                            event.data = {info: info,
+                                          new_value: $('.flyedit-choices-radio :checked').val(),
+                                          wrapper: wrapper};
+                            setTimeout(function() {
+                                $.flyedit.handleAction('choices_change', event);
+                            }, 0);
+                        };
+
                     if (info.selector === undefined) {
                         info.selector = '.value';
                     }
                     $(info.selector, wrapper).after(editButton);
-                    editButton.on('click', this.handleEditClick, function(event) {
-                        return self.handleEditClick(event, wrapper, info);
-                    });
-                },
-
-                handleEditClick: function(event, wrapper, info) {
-                    var self = this,
-                        select = $(this.html.select)
-                            .on('click', function(event) {
-                                return self.handleChange(event, wrapper, info);
-                            })
-                            .focus();
-                    $.each(info.choices, function() {
-                        var value = this[0],
-                            label = this[1],
-                            checked = value == info.value ? ' checked' : '';
-                        select.append(
-                            self.html.option
-                                .replace('VALUE', value)
-                                .replace('LABEL', label)
-                                .replace('CHECKED', checked));
-                    });
-                    $('.flyedit-choices-edit', wrapper).before(select).hide();
-                    $(info.selector, wrapper).hide();
-                },
-
-                handleChange: function(event, wrapper, info) {
-                    event.data = {info: info,
-                                  action: 'choices_change',
-                                  new_value: $(event.target).val(),
-                                  wrapper: wrapper};
-                    $.flyedit.handleAction(event);
+                    editButton.on('click', handleEditClick);
                 }
+
             }
         }
     };

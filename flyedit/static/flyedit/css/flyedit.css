@@ -24,3 +24,11 @@
     background: #fff;
     border: solid #aaa 1px;
 }
+
+.flyedit-choices-radio label {
+    cursor: pointer;
+}
+
+.flyedit-choices-radio label:hover {
+    color: #000;
+}
