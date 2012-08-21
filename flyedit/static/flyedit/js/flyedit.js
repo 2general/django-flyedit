@@ -169,7 +169,7 @@
                             $saveButton.show();
                             $cancelButton.show();
                             editor.width(rendered.width())
-                                .height(rendered.height());
+                                  .height(rendered.height());
                             rendered.hide();
                             editor.insertBefore(editControls);
                             return false;
@@ -177,7 +177,6 @@
             
                         handleSaveClick = function(event) {
                             event.data = {info: info,
-                                          action: 'text_change',
                                           new_value: $('.flyedit-text-editor', wrapper).val(),
                                           wrapper: wrapper};
                             $.flyedit.handleAction('text_change', event);
