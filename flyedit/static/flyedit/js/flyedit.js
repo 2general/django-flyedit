@@ -157,48 +157,51 @@
 
                 init: function(wrapper, info) {
                     var self = this,
-                    element,
-                    editControls = $(this.html.editControls);
+                        element,
+                        editControls = $(this.html.editControls),
+                        $editButton,
+                        $saveButton,
+                        $cancelButton;
 
-                    handleEditClick = function(event) {
-                        var editControls = event.delegateTarget,
-                            editor = $(self.html.editor).html(info.value),
-                            rendered = $(info.selector, wrapper);
-                        $('.edit', wrapper).hide();
-                        $('.save', wrapper).show();
-                        $('.cancel', wrapper).show();
-                        editor.width(rendered.width())
-                            .height(rendered.height());
-                        rendered.hide();
-                        editor.insertBefore(editControls);
-                        return false;
-                    },
-    
-                    handleSaveClick = function(event) {
-                        event.data = {info: info,
-                                      action: 'text_change',
-                                      new_value: $('.flyedit-text-editor', wrapper).val(),
-                                      wrapper: wrapper};
-                        $.flyedit.handleAction('text_change', event);
-                        return false;
-                    },
-    
-                    handleCancelClick = function(event) {
-                        $('.edit', wrapper).show();
-                        $('.save', wrapper).hide();
-                        $('.cancel', wrapper).hide();
-                        $('.flyedit-text-editor', wrapper).remove();
-                        $(info.selector, wrapper).show();
-                        return false;
-                    };
+                        handleEditClick = function(event) {
+                            var editControls = event.delegateTarget,
+                                editor = $(self.html.editor).html(info.value),
+                                rendered = $(info.selector, wrapper);
+                            $editButton.hide();
+                            $saveButton.show();
+                            $cancelButton.show();
+                            editor.width(rendered.width())
+                                .height(rendered.height());
+                            rendered.hide();
+                            editor.insertBefore(editControls);
+                            return false;
+                        },
+            
+                        handleSaveClick = function(event) {
+                            event.data = {info: info,
+                                          action: 'text_change',
+                                          new_value: $('.flyedit-text-editor', wrapper).val(),
+                                          wrapper: wrapper};
+                            $.flyedit.handleAction('text_change', event);
+                            return false;
+                        },
+            
+                        handleCancelClick = function(event) {
+                            $editButton.show();
+                            $saveButton.hide();
+                            $cancelButton.hide();
+                            $('.flyedit-text-editor', wrapper).remove();
+                            $(info.selector, wrapper).show();
+                            return false;
+                        };
 
                     if (info.selector === undefined) {
                         info.selector = '> [class!=flyedit-text-controls]';
                     }
                     $(info.selector, wrapper).last().after(editControls);
-                    editControls.on('click', '.edit', handleEditClick);
-                    editControls.on('click', '.save', handleSaveClick);
-                    editControls.on('click', '.cancel', handleCancelClick);
+                    $editButton = editControls.find('.edit').on('click', handleEditClick);
+                    $saveButton = editControls.find('.save').on('click', handleSaveClick);
+                    $cancelButton = editControls.find('.cancel').on('click', handleCancelClick);
                 }
 
             },
