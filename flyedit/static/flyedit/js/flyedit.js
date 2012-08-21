@@ -3,19 +3,21 @@
 (function($) {
   $.fn.flyedit = function() {
       // Initialize editable elements inside the current element
-      $('[data-flyedit]', this).each(function() {
-          flyedit.initializeWrapper($(this));
+      var $this = $(this),
+          $wrappers = $this.find('[data-flyedit]');
+      if ($this.attr('data-flyedit')) {
+          $wrappers.push(this);
+      }
+      $wrappers.each(function() {
+          var $wrapper = $(this),
+              data = $wrapper.data('flyedit');
+          flyedit.fieldTypes[data.type].init($wrapper, data);
       });
   };
 })(jQuery);
 
 
 flyedit = {
-    initializeWrapper: function($newWrapper) {
-        var data = $newWrapper.data('flyedit');
-        this.fieldTypes[data.type].init($newWrapper, data);
-    },
-
     makePostData: function(data, info) {
         // Prepares POST data for submitting an action.
         // `data` must contain the per-action information:
@@ -45,8 +47,8 @@ flyedit = {
         $.post(event.data.info.url, 
                flyedit.makePostData(event.data, event.data.info),
                function(html) {
-                   var newWrapper = $(html).replaceAll(event.data.wrapper);
-                   flyedit.initializeWrapper(newWrapper);
+                   $(html).replaceAll(event.data.wrapper)
+                          .flyedit();
                });
         return false;
     },
@@ -116,8 +118,8 @@ flyedit = {
                                 formData: flyedit.makePostData(actionData, info),
                                 done: function(e, data) {
                                     $form.remove();
-                                    var newWrapper = $(data.result).replaceAll(wrapper);
-                                    flyedit.initializeWrapper(newWrapper);
+                                    $(data.result).replaceAll(wrapper)
+                                                  .flyedit();
                                 },
                                 fail: function(e, data) {
                                     $('.error', $form).remove();
