@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-flyedit',
-    version='0.2.1',
+    version='0.3',
     description='Tools for Django in-line editing',
     author='Antti Kaihola',
     author_email='antti@2general.com',
