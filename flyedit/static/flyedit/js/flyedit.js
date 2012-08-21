@@ -157,15 +157,13 @@
 
                 init: function(wrapper, info) {
                     var self = this,
-                        element,
                         editControls = $(this.html.editControls),
                         $editButton,
                         $saveButton,
                         $cancelButton;
 
                         handleEditClick = function(event) {
-                            var editControls = event.delegateTarget,
-                                editor = $(self.html.editor).html(info.value),
+                            var editor = $(self.html.editor).html(info.value),
                                 rendered = $(info.selector, wrapper);
                             $editButton.hide();
                             $saveButton.show();
