@@ -1,3 +1,9 @@
+.flyedit-text-controls .save,
+.flyedit-text-controls .cancel {
+    display: none;
+}
+    
+
 .flyedit-image-remove {
     background: #f6311a;
     color: #fff;

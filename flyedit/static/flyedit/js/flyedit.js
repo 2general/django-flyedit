@@ -134,11 +134,12 @@ flyedit = {
 
         text: {
             html: {
-                editControls: '<div class="flyedit-text-controls">' +
-                              '<a class="edit" href="#">Edit</a> ' +
-                              '<a class="save" style="display: none;" href="#">Save</a> ' +
-                              '<a class="cancel" style="display: none;" href="#">Cancel</a>' +
-                              '</div>',
+                editControls: 
+                    '<div class="flyedit-text-controls">' +
+                    '    <a class="edit" href="#">Edit</a> ' +
+                    '    <input type="button" class="save" value="Save"> ' +
+                    '    <a class="cancel" href="#">Cancel</a>' +
+                    '</div>',
                 editor: '<textarea class="flyedit-text-editor"></textarea>'
             },
 
