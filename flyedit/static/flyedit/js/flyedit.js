@@ -159,52 +159,48 @@
                     var self = this,
                     element,
                     editControls = $(this.html.editControls);
+
+                    handleEditClick = function(event) {
+                        var editControls = event.delegateTarget,
+                            editor = $(self.html.editor).html(info.value),
+                            rendered = $(info.selector, wrapper);
+                        $('.edit', wrapper).hide();
+                        $('.save', wrapper).show();
+                        $('.cancel', wrapper).show();
+                        editor.width(rendered.width())
+                            .height(rendered.height());
+                        rendered.hide();
+                        editor.insertBefore(editControls);
+                        return false;
+                    },
+    
+                    handleSaveClick = function(event) {
+                        event.data = {info: info,
+                                      action: 'text_change',
+                                      new_value: $('.flyedit-text-editor', wrapper).val(),
+                                      wrapper: wrapper};
+                        $.flyedit.handleAction('text_change', event);
+                        return false;
+                    },
+    
+                    handleCancelClick = function(event) {
+                        $('.edit', wrapper).show();
+                        $('.save', wrapper).hide();
+                        $('.cancel', wrapper).hide();
+                        $('.flyedit-text-editor', wrapper).remove();
+                        $(info.selector, wrapper).show();
+                        return false;
+                    };
+
                     if (info.selector === undefined) {
                         info.selector = '> [class!=flyedit-text-controls]';
                     }
                     $(info.selector, wrapper).last().after(editControls);
-                    editControls.on('click', '.edit', function(event) {
-                        return self.handleEditClick(event, wrapper, info);
-                    });
-                    editControls.on('click', '.save', function(event) {
-                        return self.handleSaveClick(event, wrapper, info);
-                    });
-                    editControls.on('click', '.cancel', function(event) {
-                        return self.handleCancelClick(event, wrapper, info);
-                    });
-                },
-
-                handleEditClick: function(event, wrapper, info) {
-                    var editControls = event.delegateTarget,
-                        editor = $(this.html.editor).html(info.value),
-                        rendered = $(info.selector, wrapper);
-                    $('.edit', wrapper).hide();
-                    $('.save', wrapper).show();
-                    $('.cancel', wrapper).show();
-                    editor.width(rendered.width())
-                        .height(rendered.height());
-                    rendered.hide();
-                    editor.insertBefore(editControls);
-                    return false;
-                },
-
-                handleSaveClick: function(event, wrapper, info) {
-                    event.data = {info: info,
-                                  action: 'text_change',
-                                  new_value: $('.flyedit-text-editor', wrapper).val(),
-                                  wrapper: wrapper};
-                    $.flyedit.handleAction('text_change', event);
-                    return false;
-                },
-
-                handleCancelClick: function(event, wrapper, info) {
-                    $('.edit', wrapper).show();
-                    $('.save', wrapper).hide();
-                    $('.cancel', wrapper).hide();
-                    $('.flyedit-text-editor', wrapper).remove();
-                    $(info.selector, wrapper).show();
-                    return false;
+                    editControls.on('click', '.edit', handleEditClick);
+                    editControls.on('click', '.save', handleSaveClick);
+                    editControls.on('click', '.cancel', handleCancelClick);
                 }
+
             },
 
             choices: {
