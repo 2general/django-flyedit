@@ -212,36 +212,41 @@
                     select:
                         '<div class="flyedit-choices-radio">' +
                         '</div>',
-                    option:
-                        '<label>' +
-                        '    <input type="radio"' +
-                        '     name="flyedit-choices-radio"' +
-                        '     value="VALUE" CHECKED>' +
-                        '    LABEL' +
-                        '</label>' +
-                        '<br>',
+                    option: {
+                        html:
+                            '<label>' +
+                            '    <input type="radio"' +
+                            '     name="flyedit-choices-radio"' +
+                            '     value="VAL" CHK>' +
+                            '    LBL' +
+                            '</label>' +
+                            '<br>',
+                        render: function(value, label, checked) {
+                            return this.html.replace('VAL', value)
+                                            .replace('LBL', label)
+                                            .replace('CHK', checked);
+                        }
+                    },
                     editButton:
                         '<a href="#" class="flyedit-choices-edit">[edit]</a>'
                 },
 
                 init: function(wrapper, info) {
                     var self = this,
-                        editButton = $(this.html.editButton),
+                        html = self.html,
+
                         handleEditClick = function(event) {
-                            select = $(self.html.select).on('click', ':input', handleChange);
+                            select = $(html.select).on('click', ':input', handleChange);
                             $.each(info.choices, function() {
                                 var value = this[0],
                                 label = this[1],
                                 checked = value == info.value ? ' checked' : '';
-                                select.append(
-                                    self.html.option
-                                        .replace('VALUE', value)
-                                        .replace('LABEL', label)
-                                        .replace('CHECKED', checked));
+                                select.append(html.option.render(value, label, checked));
                             });
                             $('.flyedit-choices-edit', wrapper).before(select).hide();
                             $(info.selector, wrapper).hide();
                         },
+
                         handleChange = function(event) {
                             event.data = {info: info,
                                           new_value: $('.flyedit-choices-radio :checked').val(),
@@ -254,8 +259,8 @@
                     if (info.selector === undefined) {
                         info.selector = '.value';
                     }
-                    $(info.selector, wrapper).after(editButton);
-                    editButton.on('click', handleEditClick);
+                    $(html.editButton).insertAfter($(info.selector, wrapper))
+                                      .on('click', handleEditClick);
                 }
 
             }
