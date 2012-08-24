@@ -259,6 +259,92 @@
                                       .on('click', handleEditClick);
                 }
 
+            },
+
+            m2m: {
+                html: {
+                    editControls: 
+                        '<div class="flyedit-m2m-controls">' +
+                        '    <a class="edit" href="#">Edit</a> ' +
+                        '    <input type="button" class="save" value="Save"> ' +
+                        '    <a class="cancel" href="#">Cancel</a>' +
+                        '</div>',
+                    editor:
+                        '<ul class="flyedit-m2m-editor">' +
+                        '    <li class="new item">' +
+                        '        <input type="text" class="label">' +
+                        '    </li>' +
+                        '</ul>',
+                    item: 
+                        '<li class="item" data-id="ID">' +
+                        '    <span class="label">LABEL</span>' +
+                        '    <a href="#" class="remove">remove</a>' +
+                        '</li>'
+                },
+
+                init: function(wrapper, info) {
+                    var self = this,
+                        editControls = $(this.html.editControls),
+                        $editButton,
+                        $saveButton,
+                        $cancelButton,
+                        $target;
+
+                        handleEditClick = function(event) {
+                            var editor = $(self.html.editor),
+                                newItem = $('.new.item', editor),
+                                rendered = $(info.selector, wrapper); // might be empty
+                            $editButton.hide();
+                            $saveButton.show();
+                            $cancelButton.show();
+                            // editor.width(rendered.width())
+                            //       .height(rendered.height());
+                            // rendered.hide();
+                            $.each(info.value, function() {
+                                newItem.before(self.html.item
+                                               .replace('ID', this[0])
+                                               .replace('LABEL', this[1]));
+                            });
+                            editor.insertBefore(editControls)
+                                  .on('click', '.remove', handleRemoveClick);
+                            return false;
+                        },
+            
+                        handleSaveClick = function(event) {
+                            event.data = {info: info,
+                                          new_value: $('.flyedit-m2m-editor', wrapper).val(),
+                                          wrapper: wrapper};
+                            $.flyedit.handleAction('m2m_change', event);
+                            return false;
+                        },
+            
+                        handleCancelClick = function(event) {
+                            $editButton.show();
+                            $saveButton.hide();
+                            $cancelButton.hide();
+                            $('.flyedit-m2m-editor', wrapper).remove();
+                            $(info.selector, wrapper).show();
+                            return false;
+                        },
+                    
+                        handleRemoveClick = function(event) {
+                            $(this).closest('.item').remove();
+                            return false;
+                        }
+
+                    if (info.selector === undefined) {
+                        info.selector = '> [class!=flyedit-m2m-controls]';
+                    }
+                    $target = $(info.selector, wrapper).last();
+                    if ($target.length) {
+                        $target.after(editControls);
+                    } else {
+                        wrapper.append(editControls);
+                    }
+                    $editButton = editControls.find('.edit').on('click', handleEditClick);
+                    $saveButton = editControls.find('.save').on('click', handleSaveClick);
+                    $cancelButton = editControls.find('.cancel').on('click', handleCancelClick);
+                }
             }
         }
     };

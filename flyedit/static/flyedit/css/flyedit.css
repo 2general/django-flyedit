@@ -1,5 +1,7 @@
 .flyedit-text-controls .save,
-.flyedit-text-controls .cancel {
+.flyedit-text-controls .cancel,
+.flyedit-m2m-controls .save,
+.flyedit-m2m-controls .cancel {
     display: none;
 }
     
