@@ -1,10 +1,15 @@
 .flyedit-text-controls .save,
 .flyedit-text-controls .cancel,
+.flyedit-char-controls .save,
+.flyedit-char-controls .cancel,
 .flyedit-m2m-controls .save,
 .flyedit-m2m-controls .cancel {
     display: none;
 }
     
+.flyedit-char-controls {
+    display: inline-block;
+}
 
 .flyedit-image-remove {
     background: #f6311a;

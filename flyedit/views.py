@@ -112,6 +112,7 @@ class Flyedit(View):
                 'old_value': old_value}
 
     choices_change = text_change
+    char_change = text_change
 
     def m2m_change(self, data, _files):
         instance = self._get_instance(data)

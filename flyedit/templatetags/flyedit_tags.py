@@ -72,6 +72,9 @@ class FlyeditNode(Node):
         elif isinstance(field, models.TextField):
             return {'type': 'text',
                     'value': getattr(instance, field.name)}
+        elif isinstance(field, models.CharField):
+            return {'type': 'char',
+                    'value': getattr(instance, field.name)}
         elif isinstance(field, models.ManyToManyField):
             m2m_field = getattr(instance, field.name)
             data = {'type': 'm2m',

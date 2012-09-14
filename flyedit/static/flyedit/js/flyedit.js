@@ -238,6 +238,65 @@
 
             },
 
+            char: {
+                // Editor widget for input fields
+                html: {
+                    editControls:
+                        '<div class="flyedit-char-controls">' +
+                        '    <a class="edit" href="#">Edit</a> ' +
+                        '    <input type="button" class="save" value="Save"> ' +
+                        '    <a class="cancel" href="#">Cancel</a>' +
+                        '</div>',
+                    editor: '<input type="text" class="flyedit-char-editor">'
+                },
+
+                init: function(editable, flyeditParams) {
+                    var self = this,
+                        editControls = $(this.html.editControls),
+                        $editButton,
+                        $saveButton,
+                        $cancelButton;
+
+                        handleEditClick = function(event) {
+                            var editor = $(self.html.editor).val(flyeditParams.value),
+                                rendered = $(flyeditParams.selector, editable);
+                            $editButton.hide();
+                            $saveButton.show();
+                            $cancelButton.show();
+                            editor.width(rendered.width()); // .height(rendered.height());
+                            rendered.hide();
+                            editor.insertBefore(editControls);
+                            return false;
+                        },
+
+                        handleSaveClick = function(event) {
+                            event.data = {flyeditParams: flyeditParams,
+                                          new_value: $('.flyedit-char-editor', editable).val(),
+                                          editable: editable};
+                            $.flyedit.handleAction('char_change', event);
+                            return false;
+                        },
+
+                        handleCancelClick = function(event) {
+                            $editButton.show();
+                            $saveButton.hide();
+                            $cancelButton.hide();
+                            $('.flyedit-char-editor', editable).remove();
+                            $(flyeditParams.selector, editable).show();
+                            return false;
+                        };
+
+                    if (flyeditParams.selector === undefined) {
+                        flyeditParams.selector = '> [class!=flyedit-char-controls]';
+                    }
+                    $(flyeditParams.selector, editable).last().after(editControls);
+                    $editButton = editControls.find('.edit').on('click', handleEditClick);
+                    $saveButton = editControls.find('.save').on('click', handleSaveClick);
+                    $cancelButton = editControls.find('.cancel').on('click', handleCancelClick);
+                }
+
+            },
+
             choices: {
                 // Editor widget for multiple-choice fields as a group of radio
                 // buttons
