@@ -103,7 +103,6 @@
 
                 init: function(editable, flyeditParams) {
                     var html = this.html,
-                        image,
                         actionData,
                         $form,
 
@@ -160,13 +159,12 @@
                         flyeditParams.selector = 'img';
                     }
 
-                    image = $(flyeditParams.selector, editable);
                     if (flyeditParams.value) {
                         // There is an image -> display a remove button
                         actionData = {new_value: null,
                                       editable: editable};
                         $(html.removeButton)
-                            .insertAfter(image)
+                            .appendTo(editable)
                             .on('click', actionData, handleAction);
                     } else {
                         // There is no image -> display an upload form
