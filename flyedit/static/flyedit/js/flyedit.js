@@ -236,16 +236,16 @@
 
             },
 
-            char: {
+            input: {
                 // Editor widget for input fields
                 html: {
                     editControls:
-                        '<div class="flyedit-char-controls">' +
+                        '<div class="flyedit-input-controls">' +
                         '    <a class="edit" href="#">Edit</a> ' +
                         '    <input type="button" class="save" value="Save"> ' +
                         '    <a class="cancel" href="#">Cancel</a>' +
                         '</div>',
-                    editor: '<input type="text" class="flyedit-char-editor">'
+                    editor: '<input type="text" class="flyedit-input-editor">'
                 },
 
                 init: function(editable, flyeditParams) {
@@ -269,9 +269,9 @@
 
                         handleSaveClick = function(event) {
                             event.data = {flyeditParams: flyeditParams,
-                                          new_value: $('.flyedit-char-editor', editable).val(),
+                                          new_value: $('.flyedit-input-editor', editable).val(),
                                           editable: editable};
-                            $.flyedit.handleAction('char_change', event);
+                            $.flyedit.handleAction('input_change', event);
                             return false;
                         },
 
@@ -279,13 +279,13 @@
                             $editButton.show();
                             $saveButton.hide();
                             $cancelButton.hide();
-                            $('.flyedit-char-editor', editable).remove();
+                            $('.flyedit-input-editor', editable).remove();
                             $(flyeditParams.selector, editable).show();
                             return false;
                         };
 
                     if (flyeditParams.selector === undefined) {
-                        flyeditParams.selector = '> [class!=flyedit-char-controls]';
+                        flyeditParams.selector = '> [class!=flyedit-input-controls]';
                     }
                     $(flyeditParams.selector, editable).last().after(editControls);
                     $editButton = editControls.find('.edit').on('click', handleEditClick);
