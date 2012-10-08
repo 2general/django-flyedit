@@ -264,6 +264,7 @@
                             editor.width(rendered.width()); // .height(rendered.height());
                             rendered.hide();
                             editor.insertBefore(editControls);
+                            $('.flyedit-input-editor', editable).focus().select();
                             return false;
                         },
 
